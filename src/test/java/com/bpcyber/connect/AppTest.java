@@ -23,6 +23,7 @@ class RecordExpanderTest {
         Map<String, String> config = new HashMap<>();
         config.put("includeKey", "true");
         config.put("includeHeaders", "true");
+        config.put("includeMetadata", "true");
         config.put("keyFieldName", "originalKey");
         config.put("valueFieldName", "originalValue");
         config.put("headersFieldName", "originalHeaders");
@@ -57,6 +58,7 @@ class RecordExpanderTest {
         assertEquals(valueStruct, resultValue.getStruct("originalValue"));
         Map<String, String> headerMap = (Map<String, String>) resultValue.get("originalHeaders");
         assertEquals("web", headerMap.get("source"));
+        assertEquals("test-topic", resultValue.getString("topic"));
     }
 
     @Test
@@ -81,6 +83,7 @@ class RecordExpanderTest {
         assertEquals(value, resultValue.get("originalValue"));
         Map<String, String> headerMap = (Map<String, String>) resultValue.get("originalHeaders");
         assertEquals("web", headerMap.get("source"));
+        assertEquals("test-topic", resultValue.get("topic"));
     }
 
     @Test
@@ -104,5 +107,6 @@ class RecordExpanderTest {
         assertEquals(jsonValue, resultValue.get("originalValue"));
         Map<String, String> headerMap = (Map<String, String>) resultValue.get("originalHeaders");
         assertEquals("web", headerMap.get("source"));
+        assertEquals("test-topic", resultValue.get("topic"));
     }
 }
