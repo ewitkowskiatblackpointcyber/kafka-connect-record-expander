@@ -68,14 +68,15 @@ Add this SMT to your Kafka Connect connector configuration:
 "transforms.expand.includeMetadata": "true"
 ```
 
-| Config Option      | Type    | Description                                    | Default           |
-| ------------------ | ------- | -----------------------------------------------| ----------------- |
-| `includeKey`       | boolean | Whether to include the key                     | true              |
-| `includeHeaders`   | boolean | Whether to include the headers                 | true              |
-| `includeMetadata`  | boolean | Whether to include timestamp, topic, partition | true              |
-| `keyFieldName`     | string  | Field name to store the key                    | `originalKey`     |
-| `valueFieldName`   | string  | Field name to store the value                  | `originalValue`   |
-| `headersFieldName` | string  | Field name to store the headers                | `originalHeaders` |
+| Config Option           | Type    | Description                                         | Default           |
+| ----------------------- | ------- | --------------------------------------------------- | ----------------- |
+| `includeKey`            | boolean | Whether to include the key                          | true              |
+| `includeHeaders`        | boolean | Whether to include the headers                      | true              |
+| `includeMetadata`       | boolean | Whether to include timestamp, topic, partition      | true              |
+| `serializeValueAsJson`  | boolean | Serialize value as a string instead of a Map/Struct | true              |
+| `keyFieldName`          | string  | Field name to store the key                         | `key`             |
+| `valueFieldName`        | string  | Field name to store the value                       | `value`           |
+| `headersFieldName`      | string  | Field name to store the headers                     | `headers`         |
 
 ---
 

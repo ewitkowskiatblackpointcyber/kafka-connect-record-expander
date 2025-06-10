@@ -1,5 +1,7 @@
 package com.bpcyber.connect;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
 import org.apache.kafka.connect.data.Schema;
@@ -16,10 +18,10 @@ import java.util.*;
 public class RecordExpander<R extends ConnectRecord<R>> implements Transformation<R> {
     private static final Logger log = LoggerFactory.getLogger(RecordExpander.class);
 
-    // Config names
     public static final String INCLUDE_KEY_CONFIG = "includeKey";
     public static final String INCLUDE_HEADERS_CONFIG = "includeHeaders";
     public static final String INCLUDE_METADATA_CONFIG = "includeMetadata";
+    public static final String SERIALIZE_VALUE_CONFIG = "serializeValueAsJson";
 
     public static final String KEY_FIELD_NAME_CONFIG = "keyFieldName";
     public static final String VALUE_FIELD_NAME_CONFIG = "valueFieldName";
@@ -32,10 +34,13 @@ public class RecordExpander<R extends ConnectRecord<R>> implements Transformatio
     private boolean includeKey;
     private boolean includeHeaders;
     private boolean includeMetadata;
+    private boolean serializeValueAsJson;
 
     private String keyFieldName;
     private String valueFieldName;
     private String headersFieldName;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void configure(Map<String, ?> configs) {
@@ -43,24 +48,27 @@ public class RecordExpander<R extends ConnectRecord<R>> implements Transformatio
         includeKey = config.getBoolean(INCLUDE_KEY_CONFIG);
         includeHeaders = config.getBoolean(INCLUDE_HEADERS_CONFIG);
         includeMetadata = config.getBoolean(INCLUDE_METADATA_CONFIG);
+        serializeValueAsJson = config.getBoolean(SERIALIZE_VALUE_CONFIG);
+
         keyFieldName = config.getString(KEY_FIELD_NAME_CONFIG);
         valueFieldName = config.getString(VALUE_FIELD_NAME_CONFIG);
         headersFieldName = config.getString(HEADERS_FIELD_NAME_CONFIG);
     }
 
     public static final ConfigDef CONFIG_DEF = new ConfigDef()
-            .define(INCLUDE_KEY_CONFIG, ConfigDef.Type.BOOLEAN, true, ConfigDef.Importance.MEDIUM,
-                    "Include record key as a string")
+            .define(INCLUDE_KEY_CONFIG, ConfigDef.Type.BOOLEAN, true, ConfigDef.Importance.MEDIUM, "Include record key")
             .define(INCLUDE_HEADERS_CONFIG, ConfigDef.Type.BOOLEAN, true, ConfigDef.Importance.MEDIUM,
                     "Include record headers")
             .define(INCLUDE_METADATA_CONFIG, ConfigDef.Type.BOOLEAN, true, ConfigDef.Importance.MEDIUM,
                     "Include Kafka metadata: topic, partition, timestamp")
-            .define(KEY_FIELD_NAME_CONFIG, ConfigDef.Type.STRING, "originalKey", ConfigDef.Importance.MEDIUM,
-                    "Field name for key")
-            .define(VALUE_FIELD_NAME_CONFIG, ConfigDef.Type.STRING, "originalValue", ConfigDef.Importance.MEDIUM,
-                    "Field name for value")
-            .define(HEADERS_FIELD_NAME_CONFIG, ConfigDef.Type.STRING, "originalHeaders", ConfigDef.Importance.MEDIUM,
-                    "Field name for headers");
+            .define(SERIALIZE_VALUE_CONFIG, ConfigDef.Type.BOOLEAN, false, ConfigDef.Importance.MEDIUM,
+                    "Serialize 'value' field as JSON string")
+            .define(KEY_FIELD_NAME_CONFIG, ConfigDef.Type.STRING, "key", ConfigDef.Importance.MEDIUM,
+                    "Key field name")
+            .define(VALUE_FIELD_NAME_CONFIG, ConfigDef.Type.STRING, "value", ConfigDef.Importance.MEDIUM,
+                    "Value field name")
+            .define(HEADERS_FIELD_NAME_CONFIG, ConfigDef.Type.STRING, "headers", ConfigDef.Importance.MEDIUM,
+                    "Headers field name");
 
     @Override
     public R apply(R record) {
@@ -83,7 +91,11 @@ public class RecordExpander<R extends ConnectRecord<R>> implements Transformatio
                 newJsonValue.put(keyFieldName, record.key() != null ? record.key().toString() : null);
             }
 
-            newJsonValue.put(valueFieldName, originalValue);
+            Object transformedValue = serializeValueAsJson
+                    ? toJsonString(originalValue)
+                    : originalValue;
+
+            newJsonValue.put(valueFieldName, transformedValue);
 
             if (includeHeaders) {
                 Map<String, String> headersMap = new HashMap<>();
@@ -103,7 +115,6 @@ public class RecordExpander<R extends ConnectRecord<R>> implements Transformatio
 
             newValue = newJsonValue;
             log.trace("Generated schemaless new value: {}", newJsonValue);
-
         } else {
             SchemaBuilder builder = SchemaBuilder.struct().name("ExpandedRecord");
 
@@ -111,7 +122,7 @@ public class RecordExpander<R extends ConnectRecord<R>> implements Transformatio
                 builder.field(keyFieldName, Schema.OPTIONAL_STRING_SCHEMA);
             }
 
-            builder.field(valueFieldName, originalSchema);
+            builder.field(valueFieldName, serializeValueAsJson ? Schema.STRING_SCHEMA : originalSchema);
 
             if (includeHeaders) {
                 builder.field(headersFieldName,
@@ -131,7 +142,11 @@ public class RecordExpander<R extends ConnectRecord<R>> implements Transformatio
                 newStructValue.put(keyFieldName, record.key() != null ? record.key().toString() : null);
             }
 
-            newStructValue.put(valueFieldName, originalValue);
+            Object transformedValue = serializeValueAsJson
+                    ? toJsonString(originalValue)
+                    : originalValue;
+
+            newStructValue.put(valueFieldName, transformedValue);
 
             if (includeHeaders) {
                 Map<String, String> headersMap = new HashMap<>();
@@ -163,6 +178,14 @@ public class RecordExpander<R extends ConnectRecord<R>> implements Transformatio
                 record.timestamp());
     }
 
+    private String toJsonString(Object value) {
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize value to JSON", e);
+        }
+    }
+
     @Override
     public ConfigDef config() {
         return CONFIG_DEF;
@@ -170,6 +193,6 @@ public class RecordExpander<R extends ConnectRecord<R>> implements Transformatio
 
     @Override
     public void close() {
-        // No resources to clean up
+        // No resources to close
     }
 }
