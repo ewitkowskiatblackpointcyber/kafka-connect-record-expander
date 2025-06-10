@@ -114,7 +114,3 @@ MIT License. See [LICENSE](LICENSE) for details.
 ## 👥 Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to open a pull request or issue.
-
----
-
-Let me know if you want this README tailored for use with Confluent Hub, Docker, or a specific connector type (e.g., S3 sink).
