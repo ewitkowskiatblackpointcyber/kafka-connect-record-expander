@@ -73,7 +73,7 @@ Add this SMT to your Kafka Connect connector configuration:
 | `includeKey`            | boolean | Whether to include the key                          | true              |
 | `includeHeaders`        | boolean | Whether to include the headers                      | true              |
 | `includeMetadata`       | boolean | Whether to include timestamp, topic, partition      | true              |
-| `serializeValueAsJson`  | boolean | Serialize value as a string instead of a Map/Struct | true              |
+| `serializeValueAsJson`  | boolean | Serialize value as a string instead of a Map/Struct | false             |
 | `keyFieldName`          | string  | Field name to store the key                         | `key`             |
 | `valueFieldName`        | string  | Field name to store the value                       | `value`           |
 | `headersFieldName`      | string  | Field name to store the headers                     | `headers`         |
