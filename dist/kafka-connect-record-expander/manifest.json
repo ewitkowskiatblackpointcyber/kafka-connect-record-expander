@@ -16,7 +16,7 @@
   "source_url" : "https://github.com/ewitkowskiatblackpointcyber/kafka-connect-record-expander",
   "license" : [ {
     "name" : "Apache License 2.0",
-    "url" : "https:/github.com/jcustenborder/kafka-connect-transform-common/LICENSE"
+    "url" : "https://github.com/ewitkowskiatblackpointcyber/LICENSE"
   } ],
   "component_types" : [ "transform" ],
   "release_date" : "2025-05-30"
