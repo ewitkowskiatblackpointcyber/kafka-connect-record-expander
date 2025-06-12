@@ -1,51 +1,23 @@
 {
-  "name": "kafka-connect-record-expander",
-  "version": "1.0.0",
+  "name" : "kafka-connect-record-expander",
+  "version" : "1.0.0",
+  "title" : "Kafka Connect Record Expander",
   "description": "A Kafka Connect SMT that expands records with key, headers, and metadata fields.",
-  "author": "BlackPoint Cyber",
-  "license": "Apache-2.0",
-  "kafka-connect-version": "3.5.0",
-  "plugin-type": "transformation",
-  "class": "com.bpcyber.connect.RecordExpander",
-  "includes": [
-    "kafka-connect-record-expander-1.0.0.jar"
-  ],
-  "dependencies": [],
-  "config-options": {
-    "includeKey": {
-      "type": "boolean",
-      "default": true,
-      "description": "Include the Kafka record key in the expanded value."
-    },
-    "includeHeaders": {
-      "type": "boolean",
-      "default": true,
-      "description": "Include Kafka record headers in the expanded value."
-    },
-    "includeMetadata": {
-      "type": "boolean",
-      "default": true,
-      "description": "Include topic, partition, and timestamp metadata in the expanded value."
-    },
-    "serializeValueAsJson": {
-      "type": "boolean",
-      "default": false,
-      "description": "Serialize the record value as a JSON string instead of embedding it."
-    },
-    "keyFieldName": {
-      "type": "string",
-      "default": "key",
-      "description": "The field name to use for the record key."
-    },
-    "valueFieldName": {
-      "type": "string",
-      "default": "value",
-      "description": "The field name to use for the record value."
-    },
-    "headersFieldName": {
-      "type": "string",
-      "default": "headers",
-      "description": "The field name to use for Kafka headers."
-    }
-  }
+  "owner" : {
+    "username" : "ewitkowski",
+    "name" : "Erik Witkowski"
+  },
+  "support" : {
+    "summary" : "Support provided through community involvement.",
+    "url" : "https://github.com/ewitkowskiatblackpointcyber/kafka-connect-record-expander/issues"
+  },
+  "tags" : [ "Transformation", "RecordExpander" ],
+  "documentation_url" : "https://github.com/ewitkowskiatblackpointcyber/kafka-connect-record-expander",
+  "source_url" : "https://github.com/ewitkowskiatblackpointcyber/kafka-connect-record-expander",
+  "license" : [ {
+    "name" : "Apache License 2.0",
+    "url" : "https://github.com/ewitkowskiatblackpointcyber/LICENSE"
+  } ],
+  "component_types" : [ "transform" ],
+  "release_date" : "2025-05-30"
 }
